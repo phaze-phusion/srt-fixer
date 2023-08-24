@@ -1,0 +1,14 @@
+@use 'sass:math';
+$font-family-sans-serif: 'Source Sans Pro', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !default;
+$font-family-monospace: 'SFMono-Regular', Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace !default;
+
+$font-weight-light:           300 !default;
+$font-weight-regular:         400 !default;
+$font-weight-semibold:        600 !default;
+$font-weight-bold:            700 !default;
+
+@function mdc-typography-get-letter-spacing_($tracking, $font-size) {
+  @return math.div($tracking, ($font-size * 16)) * 1em;
+}
+
+$text-light: hsl(0, 0%, 87%);

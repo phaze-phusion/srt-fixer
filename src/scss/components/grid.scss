@@ -1,0 +1,31 @@
+.grid {
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 16px 18px;
+}
+
+.grid__inner {
+  display: grid;
+  align-items: stretch;
+  margin: 0;
+  grid-gap: 16px;
+}
+
+.grid__inner {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.grid__cell {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+//.grid__cell--span-all {
+//  grid-column: 1 / span 12;
+//  width: auto;
+//}
+
+.grid__cell--span-6 {
+  grid-column: span 6;
+  width: auto;
+}

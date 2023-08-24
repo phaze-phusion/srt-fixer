@@ -1,0 +1,28 @@
+@use 'sass:math';
+
+$aside-width: 240px;
+
+#srt-aside {
+  min-height: 100vh;
+  width: $aside-width;
+  position: absolute;
+
+  .srt-aside-section {
+    margin-bottom: 16px;
+  }
+
+  .srt-aside-title {
+    font-size: math.div(22, 16) * 1rem;
+    line-height: math.div(30, 22) * 1em;
+    font-weight: $font-weight-semibold;
+    letter-spacing: normal;
+    color: $text-light;
+    margin: 16px 0 0;
+    padding-left: 16px;
+  }
+}
+
+#srt-main {
+  min-height: 100vh;
+  margin-left: $aside-width;
+}

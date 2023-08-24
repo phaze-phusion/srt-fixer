@@ -1,0 +1,121 @@
+@use 'sass:math';
+
+.form-field {
+  padding: 8px 16px;
+}
+
+.form-check,
+.form-radio {
+  display: block;
+  color: inherit;
+  padding-left: 8px;
+  cursor: pointer;
+}
+
+.form-check-input,
+.form-radio-input {
+}
+
+.form-check-label,
+.form-radio-label {
+  display: inline-block;
+  margin-left: 8px;
+}
+
+.form-check-input:checked + .form-check-label,
+.form-radio-input:checked + .form-radio-label {
+  color: hsl(205, 100%, 60%);
+}
+
+// TextareaClass
+// ---------------------
+
+.form-textarea-label {
+  font-size: math.div(22, 16) * 1rem;
+  line-height: math.div(30, 22) * 1em;
+  font-weight: $font-weight-semibold;
+  letter-spacing: normal;
+  color: $text-light;
+  margin: 0 0 16px;
+  display: block;
+}
+
+.form-textarea {
+  font-size: math.div(14, 16) * 1rem;
+  line-height: 1em;
+  font-family: $font-family-monospace;
+  font-weight: $font-weight-regular;
+  letter-spacing: mdc-typography-get-letter-spacing_(0.5, math.div(14, 16));
+  width: 100%;
+  min-height: 80vh;
+  resize: none;
+  border: 1px solid hsl(0, 0%, 20%);
+  outline: 0 none;
+  padding: 5px;
+  background-color: hsl(0, 0%, 5%);
+  color: hsl(27, 100%, 59.4%);
+
+  &:focus {
+    border-color: #5cb3fd;
+  }
+}
+
+// Statistics
+// ---------------------
+.stats {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.stat {
+  flex: 0 1 auto;
+}
+
+.stat-title {
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.stat-value {
+  font-weight: 600;
+}
+
+.stat-diff-value {
+  text-align: right;
+
+  &.more {
+    color: hsl(280, 80%, 60%);
+  }
+
+  &.less {
+    color: hsl(80, 100%, 35%);
+  }
+
+  &.same {
+    color: hsl(220, 60%, 60%);
+  }
+}
+
+// Button
+// ---------------------
+
+#btn-transcribe {
+  border: 1px solid #333;
+  background-color: #222;
+  color: #ccc;
+  font-weight: 600;
+  line-height: 36px;
+  display: block;
+  text-align: center;
+  padding: 0 48px;
+  cursor: pointer;
+  border-radius: 3px;
+
+  &:hover,
+  &:focus {
+    background-color: #111;
+    color: #fff;
+  }
+}

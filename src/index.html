@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta charset="utf-8">
+  <meta name="description" content="Fix subtitle texts">
+  <meta name="author" content="phaze-phusion">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=no">
+  <title>SRT Fixer</title>
+  <link href="favicon.ico" rel="shortcut icon" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+</head>
+<body>
+<aside id="srt-aside">
+  <div class="srt-aside-title">Include</div>
+  <div class="srt-aside-section">
+
+    <div class="form-field">
+      <label for="cb-sdh" class="form-check" title="Toggle SDH">
+        <input id="cb-sdh" type="checkbox" class="form-check-input" value="sdh" checked>
+        <span class="form-check-label">SDH</span>
+      </label>
+    </div>
+
+    <div class="form-field">
+      <label for="cb-speakers" class="form-check" title="Toggle Speakers">
+        <input id="cb-speakers" type="checkbox" class="form-check-input" value="speakers" checked>
+        <span class="form-check-label">Speakers</span>
+      </label>
+    </div>
+
+    <div class="form-field">
+      <label for="cb-lowercase-speaker" class="form-check" title="Cater for lowercase speaker">
+        <input id="cb-lowercase-speaker" type="checkbox" class="form-check-input" value="lowercase">
+        <span class="form-check-label">Lowercase Speaker</span>
+      </label>
+    </div>
+
+    <div class="form-field">
+      <label for="cb-music" class="form-check" title="Toggle music">
+        <input id="cb-music" type="checkbox" class="form-check-input" value="music">
+        <span class="form-check-label">♪ ♪</span>
+      </label>
+    </div>
+
+    <div class="form-field">
+      <label for="cb-corrupt-chars" class="form-check" title="Toggle corrupt chars">
+        <input id="cb-corrupt-chars" type="checkbox" class="form-check-input" value="corruptChars" checked>
+        <span class="form-check-label">Corrupt characters</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="srt-aside-title">Show</div>
+
+  <div class="srt-aside-section">
+    <div class="form-field">
+      <label for="rd-result" class="form-radio" title="Show SDH">
+        <input id="rd-result" name="srt-show" type="radio" class="form-radio-input" value="result" checked>
+        <span class="form-radio-label">Result</span>
+      </label>
+    </div>
+
+    <div class="form-field">
+      <label for="rd-sdh" class="form-radio" title="Show SDH">
+        <input id="rd-sdh" name="srt-show" type="radio" class="form-radio-input" value="sdh">
+        <span class="form-radio-label">SDH</span>
+      </label>
+    </div>
+
+    <div class="form-field">
+      <label for="rd-speakers" class="form-radio" title="Show SDH">
+        <input id="rd-speakers" name="srt-show" type="radio" class="form-radio-input" value="speakers">
+        <span class="form-radio-label">Speakers</span>
+      </label>
+    </div>
+
+    <div class="form-field">
+      <label for="rd-nonAscii" class="form-radio" title="Show SDH">
+        <input id="rd-nonAscii" name="srt-show" type="radio" class="form-radio-input" value="nonAscii">
+        <span class="form-radio-label">Non-ASCII</span>
+      </label>
+    </div>
+
+    <div class="form-field">
+      <label for="rd-signatures" class="form-radio" title="Show SDH">
+        <input id="rd-signatures" name="srt-show" type="radio" class="form-radio-input" value="signatures">
+        <span class="form-radio-label">Signatures</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="srt-aside-section">
+    <div class="form-field">
+      <button type="button" id="btn-transcribe" class="btn btn-sm btn-block btn-primary">Show</button>
+    </div>
+  </div>
+
+</aside>
+
+<main id="srt-main">
+  <div class="grid">
+    <div class="grid__inner">
+      <div class="grid__cell grid__cell--span-6">
+        <label for="srt-input" class="form-textarea-label">Input</label>
+        <textarea id="srt-input" class="form-textarea">
+1
+00:00:13,930 --> 00:00:14,931
+[Lisa and Frank laugh]
+
+2
+00:00:15,015 --> 00:00:16,099
+-[Frank]  Ready?
+-[Lisa]  Okay.
+
+3
+00:00:16,183 --> 00:00:17,767
+[playing guitar]
+
+4
+00:00:26,068 --> 00:00:27,069
+[laughs] Dad.
+
+5
+00:00:31,614 --> 00:00:32,449
+[inaudible]
+
+6
+00:01:20,830 --> 00:01:22,582
+[man yells]
+
+7
+00:01:22,665 --> 00:01:25,001
+[tires screeching]
+
+8
+00:01:25,084 --> 00:01:27,629
+-[engine revving]
+-[men groaning]
+
+9
+00:01:29,839 --> 00:01:30,673
+One batch...
+
+10
+00:01:32,675 --> 00:01:33,510
+two batch.
+        </textarea>
+        <div id="srt-input-stats" class="stats">
+          <div class="stat"><span class="stat-title">Lines:</span><span id="srt-input-stat-lines" class="stat-value"></span></div>
+          <div class="stat"><span class="stat-title">Characters:</span><span id="srt-input-stat-chars" class="stat-value"></span></div>
+          <div class="stat"><span class="stat-title">Size:</span><span id="srt-input-stat-size" class="stat-value" data-size=""></span></div>
+        </div>
+      </div>
+      <div class="grid__cell grid__cell--span-6">
+        <label for="srt-output" class="form-textarea-label">Output</label>
+        <textarea id="srt-output" class="form-textarea"></textarea>
+        <div id="srt-output-stats" class="stats">
+          <div class="stat">
+            <div class="stat-line"><span class="stat-title">Lines:</span><span id="srt-output-stat-lines" class="stat-value"></span></div>
+            <div id="srt-output-diff-lines" class="stat-diff-value"></div>
+          </div>
+          <div class="stat">
+            <div class="stat-line"><span class="stat-title">Characters:</span><span id="srt-output-stat-chars" class="stat-value"></span></div>
+            <div id="srt-output-diff-chars" class="stat-diff-value"></div>
+          </div>
+          <div class="stat">
+            <div class="stat-line"><span class="stat-title">Size:</span><span id="srt-output-stat-size" class="stat-value" data-size=""></span></div>
+            <div id="srt-output-diff-size" class="stat-diff-value"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

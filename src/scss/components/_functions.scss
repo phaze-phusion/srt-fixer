@@ -1,0 +1,106 @@
+// Framework functions
+//
+// Replace `$search` with `$replace` in `$string`
+// Used on our SVG icon backgrounds for custom forms.
+//
+// @author Hugo Giraudel
+// @param {String} $string - Initial string
+// @param {String} $search - Substring to replace
+// @param {String} $replace ("") - New value
+// @return {String} - Updated string
+@function str-replace($string, $search, $replace: "") {
+  $index: str-index($string, $search);
+
+  @if $index {
+    @return str-slice($string, 1, $index - 1) + $replace + str-replace(str-slice($string, $index + str-length($search)), $search, $replace);
+  }
+
+  @return $string;
+}
+
+// Source of additional SASS functions:
+// https://hugogiraudel.com/2013/08/08/advanced-sass-list-functions/
+
+@function prepend($list, $value) {
+  @return join($value, $list);
+}
+
+@function first($list) {
+  @return nth($list, 1);
+}
+
+@function last($list) {
+  @return nth($list, length($list));
+}
+
+@function nth-key($map, $n) {
+  @return if($n <= length($map), nth(map-keys($map), $n), null);
+}
+
+    @function nth-first-key($map) {
+      @return nth( map-keys($map), 1 );
+    }
+
+    @function nth-last-key($map) {
+      @return nth( map-keys($map), length($map) );
+    }
+
+@function nth-value($map, $n) {
+  @return if($n <= length($map), nth(map-values($map), $n), null);
+}
+
+    @function nth-first-value($map) {
+      @return nth( map-values($map), 1 );
+    }
+
+    @function nth-last-value($map) {
+      @return nth( map-values($map), length($map) );
+    }
+
+
+// Returns the index of a key in a map.
+//
+// @overload key-index($map,$key)
+// @param $map [Sass::Script::Value::Map]
+// @param $key [Sass::Script::Value::Base]
+// @return [Sass::Script::Value::Number] Index number
+// @raise [ArgumentError] if `$map` is not a map
+@function key-index($map, $key) {
+  @return index(map-keys($map), $key);
+}
+
+// Returns the index of a value in a map.
+//
+// @overload value-index($map,$value)
+// @param $map [Sass::Script::Value::Map]
+// @param $value [Sass::Script::Value::Base]
+// @return [Sass::Script::Value::Number] Index number
+// @raise [ArgumentError] if `$map` is not a map
+@function value-index($map, $value) {
+  @return index(map-values($map), $value);
+}
+
+// Strip units from a number
+// @link http://disq.us/p/1iqd8sn
+//
+// @overload strip-unit($number)
+// @param $number [Sass::Script::Value::Number]
+// @return [Sass::Script::Value::Number] Unitless number
+@function strip-unit($number) {
+  @if type-of($number) == "number" and not unitless($number) {
+    @return $number / ($number * 0 + 1);
+  }
+  @return $number;
+}
+
+// If number is 0 units, remove the unit
+//
+// @overload zero-unit($number)
+// @param $number [Sass::Script::Value::Number]
+// @return [Sass::Script::Value::Number] number
+@function zero-unit($number) {
+  @if $number == 0px or $number == 0em or $number == 0rem or $number == 0% {
+    @return 0;
+  }
+  @return $number;
+}
