@@ -1,20 +1,20 @@
+// https://www.utf8-chartable.de/unicode-utf8-table.pl?number=128&names=2&utf8=string-literal
+
 export const RX = {
-  BREAKS:       '\\x0d?\\x0a',
-  BREAKS_RANGE: '\\x0d\\x0a',
+  BREAK:        '\\x0a', // \n
   S_QUOTE:      '\\x27',    // '
   NOTE_1:       '\\u266a',  // ♪
   NOTE_2:       '\\u266b',  // ♫
-  DASH:         '\\u002d',  // -
+  DASH:         '\\u002d',  // - (hyphen minus)
   N_DASH:       '\\u2013',
   M_DASH:       '\\u2014',
-  TIME_STAMP:   '\\d{2}:\\d{2}:\\d{2},\\d{3} --> \\d{2}:\\d{2}:\\d{2},\\d{3}'
+  DASHES_RANGE: '\\u2010-\\u2015',
+  TIME_STAMP:   '\\d{2}:\\d{2}:\\d{2},\\d{3} --> \\d{2}:\\d{2}:\\d{2},\\d{3}',
+  FONT_CLOSE:   '<\\/font>',
 };
 
-RX.ID            = '\\d+' + RX.BREAKS;
-RX.ID_TIME_BREAK = RX.ID + RX.TIME_STAMP + RX.BREAKS;
-
 export const UNI = {
-  BREAK:  '\x0a', // "\x0d\x0a", // '\r\n',
+  BREAK:  '\x0a',    // \n
   NOTE_1: '\u266a',  // ♪
   NOTE_2: '\u266b',  // ♫
   DASH:   '\u002d',

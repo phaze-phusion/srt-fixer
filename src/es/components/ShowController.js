@@ -1,27 +1,25 @@
-import {getEl} from '../_utils';
+import {getEl, isUndefined} from '../_utils';
 import {regularClean} from '../instructions/regular';
-import {CheckBoxController} from './checkboxes';
-import {showSdh, showSpeakers, speakersAndSDH} from '../instructions/shd-speakers';
+import {CheckBoxController} from './CheckBoxController';
 import {collapseMultilines} from '../instructions/multiline';
 import {musicalLyrics} from '../instructions/lyrics';
-import {showMatchingSignatures} from '../instructions/signatures';
-import {showNonAsciiCharacters} from '../instructions/non-ascii-chars';
-import {TextareaInput} from './textareaInput';
-import {TextareaOutput} from './textareaOutput';
+import {showMatchingSignatures} from '../show/signatures';
+import {showNonAsciiCharacters} from '../show/non-ascii-chars';
+import {UNI} from '../_constants';
+import {showSdh} from '../show/shd';
+import {showSpeakers} from '../show/speakers';
+import {sdhInstructions} from '../instructions/sdh';
+import {speakersInstructions} from '../instructions/speakers';
+import {IOController} from './IOController';
 
 class ShowController {
-  workingValue = '';
-  checkSdh;
-  checkSpeakers;
-  checkLowerSpeaker;
-  checkMusic;
-  checkCorruptChars;
-  areaInput;
-  areaOutput;
-
-  colorEffects = '#808080';
-  colorMusic = '#666666';
-  colorSpeaker = '#992020';
+  /** @type {string} */ workingValue = '';
+  /** @type {CheckBoxController} */ checkSdh;
+  /** @type {CheckBoxController} */ checkSpeakers;
+  /** @type {CheckBoxController} */ checkLowerSpeaker;
+  /** @type {CheckBoxController} */ checkMusic;
+  /** @type {CheckBoxController} */ checkCorruptChars;
+  /** @type {IOController} */ ioController;
 
   constructor() {
   }
@@ -32,8 +30,8 @@ class ShowController {
     this.checkLowerSpeaker = new CheckBoxController('cb-lowercase-speaker');
     this.checkMusic = new CheckBoxController('cb-music');
     this.checkCorruptChars = new CheckBoxController('cb-corrupt-chars');
-    this.areaInput = new TextareaInput('srt-input');
-    this.areaOutput = new TextareaOutput('srt-output', this.areaInput);
+
+    this.ioController = new IOController('srt-input', 'srt-output');
 
     const showOptions = ['result', 'sdh', 'speakers', 'nonAscii', 'signatures'];
     for (let bunny = 0; bunny < showOptions.length; bunny++) {
@@ -44,36 +42,48 @@ class ShowController {
   }
 
   onTranscribe() {
-    // this.areaInput.value = regularClean(this.areaInput.value);
-    // this.areaInput.writeOut();
-    // this.workingValue = this.areaInput.value;
+    this.workingValue = '';
+    this.ioController.readIn();
+    const sections = this.ioController.sectionsArray;
+    let counter = 0;
+    while (counter < sections.length) {
+      sections[counter] = regularClean(sections[counter], this.checkCorruptChars.checked);
 
-    this.workingValue = regularClean(this.areaInput.value, this.checkCorruptChars.checked);
-    this.workingValue = collapseMultilines(this.workingValue);
+      if (!isUndefined(sections[counter]) && sections[counter].lines > 1)
+        sections[counter] = collapseMultilines(sections[counter]);
 
-    this.workingValue = musicalLyrics(
-      this.workingValue,
-      this.checkMusic.checked,
-      this.colorMusic,
-      this.colorSpeaker
-    );
+      if (!isUndefined(sections[counter]))
+        sections[counter] = musicalLyrics(sections[counter], this.checkMusic.checked);
 
-    this.workingValue = speakersAndSDH(
-      this.workingValue,
-      this.checkSdh.checked,
-      this.checkSpeakers.checked,
-      this.checkLowerSpeaker.checked,
-      this.colorEffects,
-      this.colorSpeaker
-    );
+      if (!isUndefined(sections[counter]))
+        sections[counter] = sdhInstructions(sections[counter], this.checkSdh.checked);
+
+      if (!isUndefined(sections[counter]))
+        sections[counter] = speakersInstructions(
+          sections[counter],
+          this.checkSpeakers.checked,
+          this.checkLowerSpeaker.checked
+        );
+
+      let removedCount = 0;
+      while (isUndefined(sections[counter])) {
+        sections.splice(counter, 1);
+        removedCount++;
+      }
+
+      if (removedCount === 0)
+        this.workingValue += `${counter + 1}${UNI.BREAK}${sections[counter].timestamp}${UNI.BREAK}${sections[counter].text}${UNI.BREAK}${UNI.BREAK}`;
+
+      counter = counter + 1 - removedCount;
+    }
 
     const showValue = 'show_' + document.querySelector('.form-radio-input:checked').value;
     this[showValue]();
   }
 
   printOutput(output) {
-    this.areaOutput.value = output;
-    this.areaOutput.writeOut();
+    this.ioController.readIn();
+    this.ioController.writeOut(output);
   }
 
   show_result() {
@@ -81,11 +91,11 @@ class ShowController {
   }
 
   show_sdh() {
-    this.printOutput(showSdh(this.workingValue, this.colorEffects));
+    this.printOutput(showSdh(this.workingValue));
   }
 
   show_speakers() {
-    this.printOutput(showSpeakers(this.workingValue, this.colorSpeaker));
+    this.printOutput(showSpeakers(this.workingValue));
   }
 
   show_nonAscii() {

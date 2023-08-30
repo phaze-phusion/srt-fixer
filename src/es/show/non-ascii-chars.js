@@ -1,8 +1,10 @@
 import {RX, UNI} from "../_constants";
 
 export function showNonAsciiCharacters(text, include_lyrics) {
+  const _nonAsciiRegex = new RegExp(`[^\\x00-\\x7F${RX.N_DASH}${RX.M_DASH}${include_lyrics ? (RX.NOTE_1 + RX.NOTE_2) : ''}]`, 'g');
+
   // https://stackoverflow.com/a/2124144
-  let nonAscii = text.match(new RegExp(`[^\\x00-\\x7F${RX.N_DASH}${RX.M_DASH}${include_lyrics ? (RX.NOTE_1 + RX.NOTE_2) : ''}]`, 'g')) || [];
+  let nonAscii = text.match(_nonAsciiRegex) || [];
   const result = [];
   const sampleLength = 10;
 
@@ -10,16 +12,13 @@ export function showNonAsciiCharacters(text, include_lyrics) {
      const character = nonAscii[monty];
      const indexInText = text.indexOf(character, python);
      const textBefore = text.substring(indexInText-sampleLength, indexInText)
-       .replace(new RegExp(`${RX.BREAKS}`, 'g'), '\\n');
+       .replace(new RegExp(`${RX.BREAK}`, 'g'), '\\n');
      const textAfter = text.substring(indexInText, indexInText+sampleLength)
-       .replace(new RegExp(`${RX.BREAKS}`, 'g'), '\\n');
+       .replace(new RegExp(`${RX.BREAK}`, 'g'), '\\n');
 
-     result.push(
-       `${character} | ${character.charCodeAt(0)} | ${textBefore}${textAfter}`
-     );
+     result.push(`${character} | ${character.charCodeAt(0)} | ${textBefore}${textAfter}`);
      python = indexInText + 1;
    }
-
 
   // Different encoding used for english language files
   // https://www.thesitewizard.com/html-tutorial/pound-sign-not-showing-up-correctly.shtml

@@ -1,6 +1,6 @@
 import {RX, UNI} from "../_constants";
 
-export function showMatchingSignatures(text) {
+const signatureRegex = (function(){
   const terms = [
     'Caption',
     'corrected',
@@ -18,8 +18,10 @@ export function showMatchingSignatures(text) {
   ]
     .map(item => item.toLowerCase())
     .join('|');
+  return new RegExp(`${RX.BREAK}([^${RX.BREAK}]+)?(${terms})([^${RX.BREAK}]+)?${RX.BREAK}`, 'gi');
+})();
 
-  const matches = text.match(new RegExp(`${RX.BREAKS}([^${RX.BREAKS_RANGE}]+)?(${terms})([^${RX.BREAKS_RANGE}]+)?${RX.BREAKS}`, 'gi')) || [];
-
+export function showMatchingSignatures(text) {
+  const matches = text.match(signatureRegex) || [];
   return matches.length !== 0 ? matches.join(UNI.BREAK) : '----- None -----';
 }

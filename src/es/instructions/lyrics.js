@@ -1,36 +1,48 @@
-import {RX} from '../_constants';
+import {COLORS, RX} from '../_constants';
+import {undefinedIsEmptyString} from '../_utils';
 
-export function musicalLyrics(text, include_lyrics, color_music, color_speaker) {
-  // Always remove lone notes
-  text = text.replace(new RegExp(`${RX.ID}${RX.TIME_STAMP}${RX.BREAKS}${RX.NOTE_1}(${RX.BREAKS}){1,}`, 'g'), '');
+const _loneNoteRegex = new RegExp(`^[${RX.NOTE_1}${RX.NOTE_2}]+$`, 'g');
+const _speakerLyricRegex = new RegExp(`(: )(${RX.NOTE_1}[^${RX.NOTE_1}\\d]+${RX.NOTE_1}(${RX.BREAK}${RX.NOTE_1}[^${RX.NOTE_1}\\d]+${RX.NOTE_1})?)$`, 'g');
+const _includeLyricsRegex = new RegExp(`^(${RX.DASH} )?(${RX.NOTE_1}[^${RX.NOTE_1}\\d]+${RX.NOTE_1}(${RX.BREAK}${RX.NOTE_1}[^${RX.NOTE_1}\\d]+${RX.NOTE_1})?)$`, 'g');
+const _removeLyricsRegexOne = new RegExp(`^((${RX.DASH} )?${RX.NOTE_1}[^${RX.NOTE_1}\\d]+${RX.NOTE_1}(${RX.BREAK})?)+`, 'g');
+const _removeLyricsRegexTwo = new RegExp(`(${RX.DASH} (${RX.BREAK}?${RX.NOTE_1}[^${RX.NOTE_1}\\d]+${RX.NOTE_1})+)+`, 'g');
+const _removeLyricsEffectsRegex = new RegExp(`^\\[[^\\]]+\\](${RX.BREAK}${RX.NOTE_1}[^${RX.NOTE_1}\\d]+${RX.NOTE_1})+$`, 'g');
+
+export function musicalLyrics(section, include_lyrics) {
+  let value = section.text;
+
+  // Lone notes
+  if (value.match(_loneNoteRegex))
+    return;
 
   // MAN: # lyrics # >> difficult to remove without context so just keep the styling
-  text = text.replace(
-    new RegExp(`(: )(${RX.NOTE_1}[^${RX.NOTE_1}\\d]+${RX.NOTE_1}(${RX.BREAKS}${RX.NOTE_1}[^${RX.NOTE_1}\\d]+${RX.NOTE_1})?)(${RX.BREAKS})`, 'g'),
-    `$1<font color="${color_music}">$2</font>$4`
-  );
+  value = value.replace(_speakerLyricRegex, `$1<font color="${COLORS.MUSIC}">$2</font>`);
 
-  if (include_lyrics === true) {
-    // # lyrics #
-    text = text.replace(new RegExp(`(${RX.ID_TIME_BREAK})(${RX.NOTE_1}[^${RX.NOTE_1}\\d]+${RX.NOTE_1}(${RX.BREAKS}${RX.NOTE_1}[^${RX.NOTE_1}\\d]+${RX.NOTE_1})?)(${RX.BREAKS})`, 'g'),
-      `$1<font color="${color_music}">$2</font>$4`);
+  if (include_lyrics !== true) {
+    if (value.match(_removeLyricsRegexOne))
+      return;
 
-    // - # lyrics #
-    text = text.replace(new RegExp(`(${RX.BREAKS}(${RX.DASH} )?)(${RX.NOTE_1}[^${RX.NOTE_1}\\d]+${RX.NOTE_1}(${RX.BREAKS}${RX.NOTE_1}[^${RX.NOTE_1}\\d]+${RX.NOTE_1})?)(${RX.BREAKS})`, 'g'),
-      `$1<font color="${color_music}">$3</font>$5`);
-  } else {
-    text = text.replace(new RegExp(`(${RX.BREAKS}){2,}${RX.ID}${RX.TIME_STAMP}(${RX.BREAKS}(${RX.DASH} )?${RX.NOTE_1}[^${RX.NOTE_1}\\d]+${RX.NOTE_1})+`, 'g'), '');
-    text = text.replace(new RegExp(`${RX.ID}${RX.TIME_STAMP}(${RX.BREAKS}(${RX.DASH} )?${RX.NOTE_1}[^${RX.NOTE_1}\\d]+${RX.NOTE_1})+(${RX.BREAKS}){2,}`, 'g'), '');
-    // text = text.replace(new RegExp(`${RX.ID}${RX.TIME_STAMP}(${RX.BREAKS}(${RX.DASH} )?${RX.NOTE_1}[^${RX.NOTE_1}\\d]+(${RX.BREAKS})[^${RX.NOTE_1}\\d]+${RX.NOTE_1})+(${RX.BREAKS}){2,}`, 'g'), '');
+    value = value.replace(_removeLyricsRegexTwo, '');
+
+    if (value.length === 0)
+      return;
 
     // Remove Effect followed by music line
     // e.g.
     // [choir singing]
     // ♪ Wade in the water ♪
-    text = text.replace(new RegExp(`${RX.ID}${RX.TIME_STAMP}${RX.BREAKS}\\[[^\\]]+\\](${RX.BREAKS}${RX.NOTE_1}[^${RX.NOTE_1}\\d]+${RX.NOTE_1})+(${RX.BREAKS}){2,}`, 'g'), '');
-
-    text = text.replace(new RegExp(`${RX.DASH} (${RX.BREAKS}?${RX.NOTE_1}[^${RX.NOTE_1}\\d]+${RX.NOTE_1})+${RX.BREAKS}`, 'g'), '');
+    if (value.match(_removeLyricsEffectsRegex))
+      return;
+  } else {
+    // # lyrics #
+    // - # lyrics #
+    value = value.replace(
+      _includeLyricsRegex,
+      (match, p1, p2) => `${undefinedIsEmptyString(p1)}<font color="${COLORS.MUSIC}">${p2}</font>`
+    );
   }
 
-  return text;
+  section.text = value;
+
+  return section;
 }

@@ -19,8 +19,14 @@ export const newObject = properties => Object.create(null, properties);
  */
 export const objHasProp = (obj, property) => Object.prototype.hasOwnProperty.call(obj, property);
 
-export const undefinedIsEmptyString = value => (typeof value !== 'undefined') ? value : '';
+export const isUndefined = value => typeof value === 'undefined';
 
+export const undefinedIsEmptyString = value => (! isUndefined(value)) ? value : '';
+
+export const updateLineCount = section => {
+  section.lines = 1 + ((section.text.match(/\n/) || []).length);
+  return section;
+};
 
 /**
  * Sorting arrays with Non-ASCII characters
@@ -41,20 +47,5 @@ export const sortUTF8List = list => {
   return temp.map(item => list[item.index]);
 };
 
-/*
- * Get only uniques from array
- *
- * With JavaScript 1.6 / ECMAScript 5 you can use the native filter method of an Array
- * in the following way to get an array with unique values
- *
- * Example:
- *   var a = ['a', 1, 'a', 2, '1'];
- *   var unique = a.filter( onlyUnique ); // returns ['a', 1, 2, '1']
- *
- * @param {string} value
- * @returns {integer} index
- * @returns {object} self
- */
-export function filterOnlyUnique(value, index, self) {
-  return self.indexOf(value) === index;
-}
+export const fontTag = color => `<font color="${color}">`;
+export const fontClose = `</font>`;

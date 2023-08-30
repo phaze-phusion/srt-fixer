@@ -1,14 +1,14 @@
 import {RX} from "../_constants";
+import {updateLineCount} from '../_utils';
 
-export function collapseMultilines( str, minimum = 4, maximum = 33 ) {
-  for( let s = minimum, e = maximum, rx; s <= maximum; s++, e-- ) {
-    str = str.replace(new RegExp( `(${RX.BREAKS}[<\\/>', \\[\\(\\w${RX.DASH + RX.NOTE_1 + RX.NOTE_2}]{3,${s}})${RX.BREAKS}([<\\/>!', \\]\\)\\w\\.\\?${RX.DASH + RX.N_DASH + RX.NOTE_1 + RX.NOTE_2};]{3,${e}}${RX.BREAKS})`, 'g' ), '$1 $2');
-    str = str.replace(new RegExp( `(${RX.BREAKS}[<\\/>', \\[\\(\\w${RX.DASH + RX.NOTE_1 + RX.NOTE_2};]{2,5}[\\?\\.!${RX.N_DASH} ][<\\/>', \\w${RX.DASH}]{1,${s-3}})${RX.BREAKS}([<\\/>!', \\]\\)\\w\\.\\?${RX.DASH + RX.N_DASH + RX.NOTE_1 + RX.NOTE_2};]{3,${e}}${RX.BREAKS})`, 'g' ), '$1 $2');
+const _collapseRegexRange1 = `[<\\/>%', \\[\\(\\w${RX.DASH + RX.NOTE_1 + RX.NOTE_2};]`;
+const _collapseRegexRange2 = `[<\\/>%!', \\]\\)\\w\\.\\?${RX.DASH + RX.N_DASH + RX.NOTE_1 + RX.NOTE_2};]`;
+const _collapseRegexRange3 = `[\\?\\.!${RX.N_DASH} ][<\\/>%', \\w${RX.DASH}]`;
 
-    // special cases for when italics are present or not removed
-    str = str.replace(new RegExp( `(${RX.BREAKS}<i>[<\\/>', \\[\\(\\w${RX.DASH + RX.NOTE_1 + RX.NOTE_2}]{3,${s}}<\\/i>)${RX.BREAKS}([<\\/>!', \\]\\)\\w\\.\\?${RX.DASH + RX.N_DASH + RX.NOTE_1 + RX.NOTE_2};]{3,${e}}${RX.BREAKS})`, 'g' ), '$1 $2');
-
-    str = str.replace(new RegExp( `(${RX.BREAKS}[<\\/>', \\[\\(\\w${RX.DASH + RX.NOTE_1 + RX.NOTE_2}]{3,${s}})${RX.BREAKS}(<i>[<\\/>!', \\]\\)\\w\\.\\?${RX.DASH + RX.N_DASH + RX.NOTE_1 + RX.NOTE_2};]{3,${e}}<\\/i>${RX.BREAKS})`, 'g' ), '$1 $2');
+export function collapseMultilines( section, minimum = 4, maximum = 33 ) {
+  for( let s = minimum, e = maximum; s <= maximum; s++, e-- ) {
+    section.text = section.text.replace(new RegExp( `^(${_collapseRegexRange1}{3,${s}})${RX.BREAK}(${_collapseRegexRange2}{3,${e}})$`, 'g' ), '$1 $2');
+    section.text = section.text.replace(new RegExp( `^(${_collapseRegexRange1}{2,5}${_collapseRegexRange3}{1,${s-3}})${RX.BREAK}(${_collapseRegexRange2}{3,${e}})$`, 'g' ), '$1 $2');
   }
-  return str;
+  return updateLineCount(section);
 }
