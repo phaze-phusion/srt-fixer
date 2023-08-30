@@ -66,7 +66,7 @@ class ShowController {
         );
 
       let removedCount = 0;
-      while (isUndefined(sections[counter])) {
+      while (isUndefined(sections[counter]) && counter !== sections.length) {
         sections.splice(counter, 1);
         removedCount++;
       }

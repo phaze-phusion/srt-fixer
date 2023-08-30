@@ -27,27 +27,46 @@ export function speakersInstructions(section, includeSpeakers, lowercaseSpeakers
   // <font color="${COLOR.EFFECTS}">[chuckles]</font> ADAM:
   section.text = section.text.replace(_wrongOrderRegex, '$3 $1:');
 
-  // remove speaking dash for time-code with one-liner [RARE]
-  section.text = section.text.replace(/^- (.*)(?<!\n)$/, '$1');
-
   // Prepare speaking items
   section.text = section.text.replace(_prepSpeakerRegex, _prepSpeakerReplacer);
 
-  // Test for following
-  // const a = [
-  //   `Mac<%DONALD%>: `,
-  //   `MARY-<%ANNE%>: `,
-  //   `O'<%NEIL%>: `,
-  //   `T'<%POL%>: `,
-  //   `ZHO'<%KAAN%>: `,
-  //   `WOMAN'<%S VOICE%>: `,
-  //   `MRS. <%SMITH%>: `,
-  //   `DR. <%SMITH%>: `,
-  // ];
-  // for (let i = 0; i < a.length; i++)
-  //   a[i] = a[i].replace(/(\w+('|-|(\. ))?)(<%)/g, '$4$1');
-  // console.log(a);
-  section.text = section.text.replace(/(\w+('|-|(\. ))?)(<%)/g, '$4$1');
+  // Fix certain speakers being cut-off
+  // Test
+  //   const a = [
+  //     `Mac<%DONALD%>: `,
+  //     `MARY-<%ANNE%>: `,
+  //     `O'<%NEIL%>: `,
+  //     `T'<%POL%>: `,
+  //     `ZHO'<%KAAN%>: `,
+  //     `WOMAN'<%S VOICE%>: `,
+  //     `MRS. <%SMITH%>: `,
+  //     `DR. <%SMITH%>: `,
+  //   ];
+  //   for (let i = 0; i < a.length; i++)
+  //     a[i] = a[i].replace(/(\w+('|-|(\. ))?)(<%)/g, '$4$1');
+  //   console.log(a);
+  section.text = section.text.replace(/(\w+('|-|(\. ))?)\n?(<%)/g, '$4$1');
+
+  // remove speaking dash for time-code with one-liner [RARE]
+  section.text = section.text.replace(/^- (.*)(?<!\n)$/, '$1');
+
+  // Add speaking dashes for multiline where one of the lines don't have a speaker
+  // Test
+  //   const a = [
+  //     `- Base to alpha.\n<%ALPHA%>: Yes, base.`,
+  //     `<%ALPHA%>: Over,\n- We hear you.`,
+  //     `- <%HQ%>: Are you there?\n<%ALPHA%>Roger.`, // weird case but should not match
+  //     `<%HQ%>: Are you there?\n- <%ALPHA%>Roger.`, // weird case but should not match
+  //   ];
+  //   for (let i = 0; i < a.length; i++) {
+  //     a[i] = a[i].replace(/^(- (?!<%)[^\n]+\n)(<%)/g, '$1- $2');
+  //     a[i] = a[i].replace(/^(<%[^\n]+\n)(- (?!<%).*)$/g, '- $1$2');
+  //     console.log(a[i]);
+  //   }
+  section.text = section.text.replace(/^(- (?!<%)[^\n]+\n)(<%)/g, '$1- $2');
+  section.text = section.text.replace(/^(<%[^\n]+\n)(- (?!<%).*)$/g, '- $1$2');
+
+  // console.log(section.text, section.text.match(/^- [^\n]+\n<%/g));
 
   if (section.text.match(/<%/g) === null)
     return section;
