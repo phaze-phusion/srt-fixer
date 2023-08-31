@@ -26,3 +26,30 @@ $aside-width: 240px;
   min-height: 100vh;
   margin-left: $aside-width;
 }
+
+#srt-log {
+  margin: 8px 0 8px 16px;
+  line-height: 1em;
+  font-family: $font-family-monospace;
+  font-weight: $font-weight-regular;
+  border: 1px solid hsl(0, 0%, 20%);
+  padding: 5px;
+  background-color: hsl(0, 0%, 5%);
+  color: hsl(190, 100%, 60%);
+
+  .srt-log-title {
+    font-size: math.div(12, 16) * 1rem;
+  }
+
+  .srt-log-description {
+    font-size: math.div(11, 16) * 1rem;
+
+    + .srt-log-title {
+      border-top: 1px solid hsla(190, 100%, 60%, 0.5);
+    }
+  }
+
+  &:empty {
+    display: none;
+  }
+}

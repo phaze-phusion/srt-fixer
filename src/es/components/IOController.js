@@ -8,7 +8,6 @@ export class IOController {
 
   constructor(inputId, outputId) {
     this.sectionsArray = [];
-
     this.inputTextArea = new TextareaClass(inputId);
     this.outputTextArea = new TextareaClass(outputId);
     this.inputStatusBar = new StatsBar(inputId);
@@ -59,6 +58,7 @@ export class IOController {
         sections.push(section);
       }
     }
+
     return sections;
   }
 

@@ -1,16 +1,18 @@
-import {getEl, isUndefined} from '../_utils';
-import {regularClean} from '../instructions/regular';
 import {CheckBoxController} from './CheckBoxController';
-import {collapseMultilines} from '../instructions/multiline';
-import {musicalLyrics} from '../instructions/lyrics';
-import {showMatchingSignatures} from '../show/signatures';
-import {showNonAsciiCharacters} from '../show/non-ascii-chars';
+import {LogController} from './LogController';
+import {IOController} from './IOController';
+import {getEl, isUndefined} from '../_utils';
 import {UNI} from '../_constants';
-import {showSdh} from '../show/shd';
-import {showSpeakers} from '../show/speakers';
+import {musicalLyrics} from '../instructions/lyrics';
+import {collapseMultilines} from '../instructions/multiline';
+import {regularClean} from '../instructions/regular';
 import {sdhInstructions} from '../instructions/sdh';
 import {speakersInstructions} from '../instructions/speakers';
-import {IOController} from './IOController';
+import {timeStampInstructions} from '../instructions/timeStamp';
+import {showMatchingSignatures} from '../show/signatures';
+import {showNonAsciiCharacters} from '../show/non-ascii-chars';
+import {showSdh} from '../show/shd';
+import {showSpeakers} from '../show/speakers';
 
 class ShowController {
   /** @type {string} */ workingValue = '';
@@ -30,19 +32,20 @@ class ShowController {
     this.checkLowerSpeaker = new CheckBoxController('cb-lowercase-speaker');
     this.checkMusic = new CheckBoxController('cb-music');
     this.checkCorruptChars = new CheckBoxController('cb-corrupt-chars');
+    this.logger = new LogController('srt-log');
 
     this.ioController = new IOController('srt-input', 'srt-output');
 
     const showOptions = ['result', 'sdh', 'speakers', 'nonAscii', 'signatures'];
-    for (let bunny = 0; bunny < showOptions.length; bunny++) {
+    for (let bunny = 0; bunny < showOptions.length; bunny++)
       getEl(`rd-${showOptions[bunny]}`).addEventListener('click', this.onTranscribe.bind(this));
-    }
 
     getEl('btn-transcribe').addEventListener('click', this.onTranscribe.bind(this));
   }
 
   onTranscribe() {
     this.workingValue = '';
+    this.logger.clear();
     this.ioController.readIn();
     const sections = this.ioController.sectionsArray;
     let counter = 0;
@@ -71,8 +74,10 @@ class ShowController {
         removedCount++;
       }
 
-      if (removedCount === 0)
+      if (removedCount === 0) {
+        timeStampInstructions(sections[counter], this.logger);
         this.workingValue += `${counter + 1}${UNI.BREAK}${sections[counter].timestamp}${UNI.BREAK}${sections[counter].text}${UNI.BREAK}${UNI.BREAK}`;
+      }
 
       counter = counter + 1 - removedCount;
     }
@@ -82,7 +87,6 @@ class ShowController {
   }
 
   printOutput(output) {
-    this.ioController.readIn();
     this.ioController.writeOut(output);
   }
 
