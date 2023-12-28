@@ -99,11 +99,11 @@ const _spaceSpeakerDashRegex = new RegExp(`((^|${RX.BREAK})-)([^\\s\-]{1})`, 'g'
 // const _cleanSpeakerRegex4 = new RegExp(`^([^-]{1}[^${RX.BREAK}]+${RX.BREAK}- )`, 'g');
 // const _cleanSpeakerRegex5 = new RegExp(`^(-[^${RX.BREAK}]+${RX.BREAK})([^-]{1}[A-Z]{2,})`, 'g');
 
-const _lowercaseSpeakerRegex = new RegExp(`^(- )?(${RX_SPEAKER_RANGE}):\\s+`, 'ig');
-const _lowercaseSpeakerReplacer = (match, p1, p2) => {
+const _lowercaseSpeakerRegex = new RegExp(`((^|${RX.BREAK})- )?(${RX_SPEAKER_RANGE}):\\s+`, 'ig');
+const _lowercaseSpeakerReplacer = (match, p1, p2, p3) => {
   p1 = undefinedIsEmptyString(p1);
-  p2 = p2.toUpperCase().trim();
-  return `${p1}<%${p2}%>: `;
+  p3 = p3.toUpperCase().trim();
+  return `${p1}<%${p3}%>: `;
 };
 
 const _wrongOrderRegex = new RegExp(`(${fontTag(COLORS.EFFECTS)}[^<]+${RX.FONT_CLOSE})(\\s+)?(${RX_SPEAKER_RANGE}):`, 'g');
