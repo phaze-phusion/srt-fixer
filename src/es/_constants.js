@@ -27,3 +27,9 @@ export const COLORS = {
   MUSIC:   '#666666',
   SPEAKER: '#992020',
 };
+
+export const COLORS_RX = {
+  EFFECTS: new RegExp(COLORS.EFFECTS),
+  MUSIC:   new RegExp(COLORS.MUSIC),
+  SPEAKER: new RegExp(COLORS.SPEAKER),
+}

@@ -1,10 +1,15 @@
 /**
- * @typedef {Object} Section
- * @property {number} timestamp - The time code
- * @property {string} text - Text content
- * @property {number} lines - Line count of content
+ * @typedef {Map<Timestamp,Section>} SectionMap
  */
 
 /**
- * @typedef {Section[]} SectionArray
+ * @typedef {string} Timestamp
+ * @description
+ *   Format "nn:nn:nn,nnn --> nn:nn:nn,nnn"
+ */
+
+/**
+ * @typedef {string} TimestampPart
+ * @description
+ *   Format "nn:nn:nn,nnn"
  */
