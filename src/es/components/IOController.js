@@ -1,13 +1,17 @@
-import {getEl, isUndefined} from '../_utils';
+import {getEl} from '../_utils';
 import {StatsBar} from './StatsBar';
+import {Section} from './SectionClass';
 import {normalizeInput, normalizeOutput} from '../instructions/normalizer';
 import {UNI} from '../_constants';
 
 export class IOController {
-  /** @type {Section[]} */ sectionsArray;
+  /** @type {SectionMap} */ sectionsMap;
+  /** @type {TextareaClass} */ inputTextArea;
+  /** @type {TextareaClass} */ outputTextArea;
+  /** @type {StatsBar} */ inputStatusBar;
+  /** @type {StatsBar} */ outputStatusBar;
 
   constructor(inputId, outputId) {
-    this.sectionsArray = [];
     this.inputTextArea = new TextareaClass(inputId);
     this.outputTextArea = new TextareaClass(outputId);
     this.inputStatusBar = new StatsBar(inputId);
@@ -16,7 +20,7 @@ export class IOController {
 
   readIn() {
     this.inputTextArea.readIn(true);
-    this.sectionsArray = IOController.valueToArray(this.inputTextArea.value);
+    this.sectionsMap = IOController._valueToMap(this.inputTextArea.value);
     this.inputStatusBar.writeStats(this.inputTextArea.value);
   }
 
@@ -27,35 +31,38 @@ export class IOController {
 
   /**
    * @param {string} value
-   * @returns {Section[]}
+   * @returns {SectionMap}
+   * @private
    */
-  static valueToArray(value) {
+  static _valueToMap(value) {
     /** @type {string[]} */
     const lines = value.split('\n');
 
-    /** @type {Section[]} */
-    const sections = [];
+    /** @type {Map<string, Section>} */
+    const sections = new Map();
     for (let kiwi = 0; kiwi < lines.length; kiwi++) {
       const line = lines[kiwi];
       if (line === '')
         continue;
 
-      if (line.match(/\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}/) !== null) {
-        /** @type {Section} */
-        const section= {
-          timestamp: lines[kiwi],
-          text: '',
-          lines: 0,
-        };
+      const timestampMatch = line.match(/(\d{2}:\d{2}:\d{2},\d{3}) --> (\d{2}:\d{2}:\d{2},\d{3})/);
+
+      if (timestampMatch !== null) {
+        let sectionContent = '';
 
         while (lines[++kiwi] !== '') {
-          section.text += lines[kiwi];
+          sectionContent += lines[kiwi];
           if (lines[kiwi + 1] !== '')
-            section.text += UNI.BREAK;
-          section.lines++;
+            sectionContent += UNI.BREAK;
         }
 
-        sections.push(section);
+        if (sections.has(timestampMatch[0])) {
+          console.error('Timestamp 1 content:\n' + sections.get(timestampMatch[0]).content);
+          console.error('Timestamp 2 content:\n' + sectionContent);
+          throw new Error(`Duplicate timestamp "${timestampMatch[0]}"`)
+        }
+
+        sections.set(timestampMatch[0], new Section(timestampMatch, sectionContent));
       }
     }
 

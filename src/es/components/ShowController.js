@@ -3,20 +3,21 @@ import {LogController} from './LogController';
 import {IOController} from './IOController';
 import {getEl, isUndefined} from '../_utils';
 import {UNI} from '../_constants';
-import {musicalLyrics} from '../instructions/lyrics';
+import {musicInstructions} from '../instructions/music';
 import {collapseMultilines} from '../instructions/multiline';
 import {regularClean} from '../instructions/regular';
-import {sdhInstructions} from '../instructions/sdh';
+import {effectsInstructions} from '../instructions/effects';
 import {speakersInstructions} from '../instructions/speakers';
-import {timeStampInstructions} from '../instructions/timeStamp';
+import {timestampInstructions} from '../instructions/timeStamp';
 import {showMatchingSignatures} from '../show/signatures';
 import {showNonAsciiCharacters} from '../show/non-ascii-chars';
-import {showSdh} from '../show/shd';
+import {showEffects} from '../show/effects';
 import {showSpeakers} from '../show/speakers';
 
 class ShowController {
   /** @type {string} */ workingValue = '';
-  /** @type {CheckBoxController} */ checkSdh;
+  /** @type {SectionMap} */ sectionMap;
+  /** @type {CheckBoxController} */ checkEffects;
   /** @type {CheckBoxController} */ checkSpeakers;
   /** @type {CheckBoxController} */ checkLowerSpeaker;
   /** @type {CheckBoxController} */ checkMusic;
@@ -27,16 +28,17 @@ class ShowController {
   }
 
   init() {
-    this.checkSdh = new CheckBoxController('cb-sdh');
+    this.checkEffects = new CheckBoxController('cb-effects');
     this.checkSpeakers = new CheckBoxController('cb-speakers');
     this.checkLowerSpeaker = new CheckBoxController('cb-lowercase-speaker');
     this.checkMusic = new CheckBoxController('cb-music');
     this.checkCorruptChars = new CheckBoxController('cb-corrupt-chars');
+    this.checkItalics = new CheckBoxController('cb-italics');
     this.logger = new LogController('srt-log');
 
     this.ioController = new IOController('srt-input', 'srt-output');
 
-    const showOptions = ['result', 'sdh', 'speakers', 'nonAscii', 'signatures'];
+    const showOptions = ['result', 'effects', 'speakers', 'nonAscii', 'signatures'];
     for (let bunny = 0; bunny < showOptions.length; bunny++)
       getEl(`rd-${showOptions[bunny]}`).addEventListener('click', this.onTranscribe.bind(this));
 
@@ -47,40 +49,31 @@ class ShowController {
     this.workingValue = '';
     this.logger.clear();
     this.ioController.readIn();
-    const sections = this.ioController.sectionsArray;
-    let counter = 0;
-    while (counter < sections.length) {
-      sections[counter] = regularClean(sections[counter], this.checkCorruptChars.checked);
+    this.sectionsMap = this.ioController.sectionsMap;
 
-      if (!isUndefined(sections[counter]) && sections[counter].lines > 1)
-        sections[counter] = collapseMultilines(sections[counter]);
+    this.sectionsMap.forEach((section, key, map) => {
+      const regularCleaned = regularClean(section, this.checkCorruptChars.checked);
+      if (!isUndefined(regularCleaned)) map.set(key, regularCleaned); else return map.delete(key);
 
-      if (!isUndefined(sections[counter]))
-        sections[counter] = musicalLyrics(sections[counter], this.checkMusic.checked);
+      const musical = musicInstructions(section, this.logger, this.checkMusic.checked, this.checkItalics.checked);
+      if (!isUndefined(musical)) map.set(key, musical); else return map.delete(key);
 
-      if (!isUndefined(sections[counter]))
-        sections[counter] = sdhInstructions(sections[counter], this.checkSdh.checked);
+      const hearingImpaired = effectsInstructions(section, this.checkEffects.checked);
+      if (!isUndefined(hearingImpaired)) map.set(key, hearingImpaired); else return map.delete(key);
 
-      if (!isUndefined(sections[counter]))
-        sections[counter] = speakersInstructions(
-          sections[counter],
-          this.checkSpeakers.checked,
-          this.checkLowerSpeaker.checked
-        );
+      map.set(key, speakersInstructions(section, this.checkSpeakers.checked, this.checkLowerSpeaker.checked));
 
-      let removedCount = 0;
-      while (isUndefined(sections[counter]) && counter !== sections.length) {
-        sections.splice(counter, 1);
-        removedCount++;
-      }
+      // After work was done re-balance multi-lines
+      if (section.lines > 1)
+        map.set(key, collapseMultilines(section));
 
-      if (removedCount === 0) {
-        timeStampInstructions(sections[counter], this.logger);
-        this.workingValue += `${counter + 1}${UNI.BREAK}${sections[counter].timestamp}${UNI.BREAK}${sections[counter].text}${UNI.BREAK}${UNI.BREAK}`;
-      }
+      timestampInstructions(section, this.logger);
+    });
 
-      counter = counter + 1 - removedCount;
-    }
+    let sectionCounter = 0;
+    this.sectionsMap.forEach((section, timestamp) => {
+      this.workingValue += `${++sectionCounter}${UNI.BREAK}${timestamp}${UNI.BREAK}${section.content}${UNI.BREAK}${UNI.BREAK}`;
+    });
 
     const showValue = 'show_' + document.querySelector('.form-radio-input:checked').value;
     this[showValue]();
@@ -94,12 +87,12 @@ class ShowController {
     this.printOutput(this.workingValue);
   }
 
-  show_sdh() {
-    this.printOutput(showSdh(this.workingValue));
+  show_effects() {
+    this.printOutput(showEffects(this.sectionsMap));
   }
 
   show_speakers() {
-    this.printOutput(showSpeakers(this.workingValue));
+    this.printOutput(showSpeakers(this.workingValue, this.sectionsMap));
   }
 
   show_nonAscii() {

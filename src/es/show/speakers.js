@@ -1,24 +1,46 @@
-import {COLORS, RX, UNI} from '../_constants';
+import {COLORS, UNI} from '../_constants';
 
-const _speakersRegex = new RegExp(`${RX.BREAK}([^${RX.BREAK}]+)?<font color="${COLORS.SPEAKER}">.+(${RX.BREAK}.+)?<\\/font>([^${RX.BREAK}]+)?${RX.BREAK}`, 'g');
-const _speakersOutRegex1 = new RegExp(`(<font color="${COLORS.SPEAKER}">)|(<\\/font>)`, 'g');
-const _speakersOutRegex2 = new RegExp(`(\\S)${RX.BREAK}(\\S)`, 'g');
-const _speakersOutRegex3 = new RegExp(`((^${RX.BREAK})|(${RX.BREAK}$))`, 'g');
+/**
+ * @param {string} text
+ * @param {SectionMap} sectionsMap
+ * @returns {string}
+ */
+export function showSpeakers(text, sectionsMap) {
+  let output = '';
+  let speakers = [];
 
-const _matchMapSpeakers = caught => {
-  caught = caught.replace(_speakersOutRegex1, '');
-  caught = caught.replace(/\n-\s+/g, '\n');
-  caught = caught.replace(_speakersOutRegex2, '$1 $2');
-  caught = caught.replace(_speakersOutRegex3, '');
-  return caught;
-};
+  sectionsMap.forEach((section, _timestamp) => {
+    if (!section.hasSpeaker)
+      return;
 
-const _uniqueMapSpeakers = caught => {
-  caught = caught.replace(/^<font.*/, '');
-  caught = caught.replace(/ <font.*/, ''); // remove effect from speaker line
-  caught = caught.replace(/:.*/, '');
-  return caught;
-};
+    if (section.lines === 1) {
+      output += section.content.replace(_speakerMinFontRegex, '') + UNI.BREAK;
+      speakers.push(Array.from(section.content.matchAll(_speakerOnlyRegex))[0][1]);
+      return;
+    }
+
+    section.content.split('\n').map(line => {
+      if (_speakerMinFontRegex.test(line)) {
+        output += line.replace(_speakerMinFontRegex, '') + UNI.BREAK;
+        speakers.push(Array.from(line.matchAll(_speakerOnlyRegex))[0][1]);
+      }
+    });
+  });
+
+  if (output === '')
+    return '----- None / Toggle Speakers -----'
+
+  speakers = speakers
+      .filter(filterOnlyUnique)
+      .sort(sortAlphabetically)
+
+  output = speakers.join('\n') + '\n\n----------\nInstances\n----------\n\n' + output;
+
+  return output;
+}
+
+const _speakerMinFontRegex = new RegExp(`(<font color="#[a-fA-F0-9]+">)|(<\\/font>)`, 'g');
+const _speakerOnlyRegex = new RegExp(`<font color="${COLORS.SPEAKER}">([^<]+)<\\/font>`, 'g');
 
 /*
  * Get only uniques from array
@@ -36,22 +58,3 @@ const _uniqueMapSpeakers = caught => {
  */
 const filterOnlyUnique = (value, index, self) => self.indexOf(value) === index;
 const sortAlphabetically = (a, b) => (a > b) ? 1 : ((b < a) ? -1 : 0);
-
-export function showSpeakers(text) {
-  let matches = text.match(_speakersRegex) || [];
-
-  if (matches.length !== 0) {
-    matches = matches.map(_matchMapSpeakers);
-    matches = matches.join(UNI.BREAK);
-
-    let uniques = matches.split(`${UNI.BREAK}`);
-    uniques = uniques.map(_uniqueMapSpeakers);
-    uniques = uniques.filter(filterOnlyUnique);
-    uniques = uniques.sort(sortAlphabetically);
-
-    // caught = caught.replace(/:.*$/, '');
-
-    return uniques.join(UNI.BREAK);
-  }
-  return '----- Toggle SDH / NONE -----';
-}

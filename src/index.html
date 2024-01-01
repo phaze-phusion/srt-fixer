@@ -9,8 +9,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, shrink-to-fit=no">
   <title>SRT Fixer</title>
   <link href="favicon.ico" rel="shortcut icon" type="image/x-icon">
-  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <!--<link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">-->
 </head>
 <body>
 <aside id="srt-aside">
@@ -18,9 +18,9 @@
   <div class="srt-aside-section">
 
     <div class="form-field">
-      <label for="cb-sdh" class="form-check" title="Toggle SDH">
-        <input id="cb-sdh" type="checkbox" class="form-check-input" value="sdh" checked>
-        <span class="form-check-label">SDH</span>
+      <label for="cb-effects" class="form-check" title="Toggle Effects">
+        <input id="cb-effects" type="checkbox" class="form-check-input" value="effects" checked>
+        <span class="form-check-label">Effects</span>
       </label>
     </div>
 
@@ -46,6 +46,13 @@
     </div>
 
     <div class="form-field">
+      <label for="cb-italics" class="form-check" title="Toggle corrupt chars">
+        <input id="cb-italics" type="checkbox" class="form-check-input" value="italics">
+        <span class="form-check-label">Italics</span>
+      </label>
+    </div>
+
+    <div class="form-field">
       <label for="cb-corrupt-chars" class="form-check" title="Toggle corrupt chars">
         <input id="cb-corrupt-chars" type="checkbox" class="form-check-input" value="corruptChars" checked>
         <span class="form-check-label">Corrupt characters</span>
@@ -64,9 +71,9 @@
     </div>
 
     <div class="form-field">
-      <label for="rd-sdh" class="form-radio" title="Show SDH">
-        <input id="rd-sdh" name="srt-show" type="radio" class="form-radio-input" value="sdh">
-        <span class="form-radio-label">SDH</span>
+      <label for="rd-effects" class="form-radio" title="Show Effects">
+        <input id="rd-effects" name="srt-show" type="radio" class="form-radio-input" value="effects">
+        <span class="form-radio-label">Effects</span>
       </label>
     </div>
 
