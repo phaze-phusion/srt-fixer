@@ -1,10 +1,11 @@
 import {describe, expect, it, test} from 'vitest'
 import {musicInstructions} from '../../src/es/instructions/music'
+import {fontTagged} from '../../src/es/_utils';
 import {COLORS} from '../../src/es/_constants';
-import {fontifyBase, mockSection} from '../mocks';
+import {mockSection} from '../mocks';
 
 function fontify(value) {
-  return fontifyBase(value, COLORS.MUSIC);
+  return fontTagged(COLORS.MUSIC, value);
 }
 
 function wrapFnReturnContent(content, includeMusic = true) {

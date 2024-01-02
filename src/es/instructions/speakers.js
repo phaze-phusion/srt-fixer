@@ -1,5 +1,5 @@
 import {COLORS, RX, UNI} from '../_constants';
-import {fontClose, fontTag} from '../_utils';
+import {fontTag, fontTagged} from '../_utils';
 import {collapseMultilines} from './multiline';
 
 /**
@@ -85,7 +85,7 @@ export function speakersInstructions(section, includeSpeakers, lowercaseSpeakers
     return section;
 
   if (includeSpeakers === true) {
-    content = content.replace(/<%(.*)%>/g, fontTag(COLORS.SPEAKER) + '$1' + fontClose);
+    content = content.replace(/<%(.*)%>/g, fontTagged(COLORS.SPEAKER, '$1'));
   } else {
     // Replace speakers on 2 lines with dashes
     // e.g.

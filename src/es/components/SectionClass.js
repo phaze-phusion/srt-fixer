@@ -60,6 +60,11 @@ export class Section {
     this._tags.speaker = !!COLORS_RX.SPEAKER.test(value);
   }
 
+  /** @returns {string} */
+  get content() {
+    return this._content;
+  }
+
   /** @returns {Timestamp} */
   get timestamp() {
     return this._timestamp;
@@ -70,19 +75,9 @@ export class Section {
     return this._timeOnScreen;
   }
 
-  /** @returns {string} */
-  get content() {
-    return this._content;
-  }
-
   /** @returns {number} */
   get lines() {
     return this._lines;
-  }
-
-  /** @returns {string} */
-  get text() {
-    return this._text;
   }
 
   /** @returns {boolean} */

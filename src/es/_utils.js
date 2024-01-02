@@ -41,4 +41,4 @@ export const isUndefined = value => typeof value === 'undefined';
 // };
 
 export const fontTag = color => `<font color="${color}">`;
-export const fontClose = `</font>`;
+export const fontTagged = (color, value) => `<font color="${color}">${value}</font>`;

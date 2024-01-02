@@ -92,7 +92,7 @@ class ShowController {
   }
 
   show_speakers() {
-    this.printOutput(showSpeakers(this.workingValue, this.sectionsMap));
+    this.printOutput(showSpeakers(this.sectionsMap));
   }
 
   show_nonAscii() {

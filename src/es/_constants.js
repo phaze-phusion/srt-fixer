@@ -9,7 +9,7 @@ export const RX = {
   N_DASH:       '\\u2013',
   M_DASH:       '\\u2014',
   DASHES_RANGE: '\\u2010-\\u2015',
-  TIME_STAMP:   '\\d{2}:\\d{2}:\\d{2},\\d{3} --> \\d{2}:\\d{2}:\\d{2},\\d{3}',
+  TIME_STAMP:   '(\\d{2}:\\d{2}:\\d{2},\\d{3}) --> (\\d{2}:\\d{2}:\\d{2},\\d{3})',
   FONT_CLOSE:   '<\\/font>',
 };
 

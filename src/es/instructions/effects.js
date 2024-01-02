@@ -1,24 +1,30 @@
-import {fontClose, fontTag} from '../_utils';
 import {COLORS, RX} from '../_constants';
+import {fontTagged} from '../_utils';
 
 /**
  * @param {Section} section
- * @param {boolean} include_effects
+ * @param {boolean} includeEffects
  * @returns {Section|undefined}
  */
-export function effectsInstructions(section, include_effects) {
+export function effectsInstructions(section, includeEffects) {
   let content = section.content;
 
-  // Clean SDH
+  // Clean Effects
   // ----------------------------------
-  // Prepare SDH by tagging and upper-casing it
-  content = content.replace(/([(\[])([^\])]+)([)\]])/g, _prepSdhReplace);
+  content = _prepEffects(content);
 
-  // Return if there are no SDH in section text
-  if (!/<%/.test(content))
+  // Return undefined if only empty brackets were found
+  if (content.trim() === '<%%>')
+    return;
+
+  // Return if there are no effects in content
+  if (!/<%/.test(content)) {
+    // Update content with possibly empty brackets removed
+    section.content = content;
     return section;
+  }
 
-  // Fix SHD on multiple lines
+  // Fix Effects on multiple lines
   // From
   //   [BELL CHIMES%> <%SNOOPY WHINES]
   // To
@@ -26,8 +32,8 @@ export function effectsInstructions(section, include_effects) {
   //   [SNOOPY WHINES]
   content = content.replace(/(%>) (<%)/g, '$1\n$2');
 
-  if (include_effects === true) {
-    content = content.replace(/<%([^<]+)%>/g, _sdhReplace);
+  if (includeEffects === true) {
+    content = content.replace(/<%([^<]+)%>/g, fontTagged(COLORS.EFFECTS, '[$1]'));
   } else {
     content = content.replace(/<%([^<]+)%> ?/g, '');
   }
@@ -44,18 +50,19 @@ export function effectsInstructions(section, include_effects) {
 }
 
 /**
- * @param {string} match
- * @param {string} p1
- * @param {string} p2
- * @returns {`<%${string}%>`}
+ * Prepare Effects by tagging and upper-casing it
+ * @param {string} content
+ * @returns {string}
  * @private
  */
-const _prepSdhReplace = (match, p1, p2) => {
-  // p1 => first bracket ( or [
-  // p3 => last bracket ) or ]
-  p2 = (p2 ?? '').toUpperCase().trim();
-  return `<%${p2}%>`;
-};
+const _prepEffects = content => content.replace(
+  /([(\[])([^\])]+)([)\]])/g,
+  (match, p1, p2) => {
+    // p1 => first bracket ( or [
+    // p3 => last bracket ) or ]
+    p2 = p2.toUpperCase().trim();
+    return `<%${p2}%>`;
+  }
+);
 
 const _loneSpeakerDashRegex = new RegExp(`- ?(${RX.BREAK}|$)`, 'g');
-const _sdhReplace = fontTag(COLORS.EFFECTS) + `[$1]` + fontClose;

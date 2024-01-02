@@ -1,10 +1,11 @@
 import {describe, expect, it, test} from 'vitest'
 import {COLORS} from '../../src/es/_constants';
+import {fontTagged} from '../../src/es/_utils';
 import {speakersInstructions} from '../../src/es/instructions/speakers';
-import {fontifyBase, mockSection} from '../mocks';
+import {mockSection} from '../mocks';
 
 function fontify(value) {
-  return fontifyBase(value, COLORS.SPEAKER);
+  return fontTagged(COLORS.SPEAKER, value);
 }
 
 function wrapFnReturnContent(content, includeSpeakers = true, lowercaseSpeakers = false) {

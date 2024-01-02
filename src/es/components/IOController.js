@@ -1,8 +1,8 @@
+import {RX, UNI} from '../_constants';
 import {getEl} from '../_utils';
 import {StatsBar} from './StatsBar';
 import {Section} from './SectionClass';
 import {normalizeInput, normalizeOutput} from '../instructions/normalizer';
-import {UNI} from '../_constants';
 
 export class IOController {
   /** @type {SectionMap} */ sectionsMap;
@@ -45,7 +45,7 @@ export class IOController {
       if (line === '')
         continue;
 
-      const timestampMatch = line.match(/(\d{2}:\d{2}:\d{2},\d{3}) --> (\d{2}:\d{2}:\d{2},\d{3})/);
+      const timestampMatch = line.match(RX.TIME_STAMP);
 
       if (timestampMatch !== null) {
         let sectionContent = '';
@@ -74,15 +74,12 @@ export class IOController {
 class TextareaClass {
   /** @type {string} */ id;
   /** @type {HTMLElement} */ el;
-  /** @type {Section[]} */ valueArray;
   /** @type {string} */ value ;
-  /** @type {StatsBar} */ statsBar ;
 
   constructor(id) {
     this.id = id;
     this.el = getEl(this.id);
     this.value = '';
-    this.valueArray = [];
     this.readIn(true);
   }
 
