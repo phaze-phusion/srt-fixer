@@ -1,15 +1,13 @@
 /* global __dirname */
 
-const path                 = require('path'),
-      pathRoot             = __dirname,
-      MiniCssExtractPlugin = require('mini-css-extract-plugin'),
-      HtmlWebpackPlugin    = require('html-webpack-plugin'),
-      CssMinimizerPlugin   = require('css-minimizer-webpack-plugin'),
-      TerserPlugin         = require('terser-webpack-plugin'),
-      {CleanWebpackPlugin} = require('clean-webpack-plugin'),
-      StyleLintPlugin      = require('stylelint-webpack-plugin'),
-      webpack              = require('webpack'),
-      npmPackage           = require(path.resolve(pathRoot, './package.json'));
+const path = require('path');
+const pathRoot = __dirname;
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const npmPackage = require(path.resolve(pathRoot, './package.json'));
 
 const packageName = npmPackage.name;
 
@@ -24,11 +22,9 @@ module.exports = (env, argv) => {
     // https://webpack.js.org/configuration/output/
     output: {
       filename: `js/${packageName}.js`,
-      // library: 'userContext',
-      // libraryTarget: 'window',
     },
     target: ['browserslist'],
-    resolve: { extensions: ['.js'] },
+    resolve: {extensions: ['.js']},
     module: {
       rules: [
         {
@@ -36,7 +32,7 @@ module.exports = (env, argv) => {
           exclude: /local/,
           use: [
             'style-loader',
-            { loader: 'css-loader', options: { importLoaders: 1 } },
+            {loader: 'css-loader', options: {importLoaders: 1}},
             'postcss-loader', // options loaded from postcss.config.js
           ],
         },
@@ -84,16 +80,10 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.(svg|jpg|png|ico)$/i,
-          use: [
-            {
-              loader: 'file-loader',
-              options: {
-                name: '[path][name].[ext]',
-                context: 'src/',
-                publicPath: '../'
-              }
-            }
-          ]
+          type: 'asset/resource',
+          generator: {
+            filename: '[name][ext]',
+          },
         },
         {
           test: /\.js$/,
@@ -138,7 +128,6 @@ module.exports = (env, argv) => {
         serveIndex: true, // options for the `serveIndex` option you can find https://github.com/expressjs/serve-index
         watch: true, // options for the `watch` option you can find https://github.com/paulmillr/chokidar
       },
-      // hot: true,
       client: false, // Bug on Webpack 5: https://github.com/webpack/webpack-dev-server/issues/2484
       // client: {
       //   logging: "info",
@@ -157,15 +146,8 @@ module.exports = (env, argv) => {
     };
 
     config.performance = false;
-    config.devtool     = 'source-map';
-    config.plugins     = [
-      new webpack.DefinePlugin({
-        VERSION: JSON.stringify(npmPackage.version),
-      }),
-      // new MiniCssExtractPlugin({
-      //   filename: 'css/[name].css',
-      //   chunkFilename: 'css/[id].css',
-      // }),
+    config.devtool = 'source-map';
+    config.plugins = [
       new HtmlWebpackPlugin({
         inject: true,
         hash: false,
@@ -181,10 +163,9 @@ module.exports = (env, argv) => {
   // Production build
   // ------------------------------------------------------
   if (argv.mode === 'production') {
-
-    config.output.path     = path.resolve(pathRoot, './dist/');
+    config.output.path = path.resolve(pathRoot, './dist/');
     config.output.filename = `${packageName}.min.js`;
-    config.optimization    = {
+    config.optimization = {
       minimize: true,
       minimizer: [
         // https://webpack.js.org/plugins/terser-webpack-plugin/
@@ -240,9 +221,6 @@ module.exports = (env, argv) => {
     };
 
     config.plugins = [
-      // new webpack.DefinePlugin({
-      //   VERSION: JSON.stringify(npmPackage.version),
-      // }),
       new CleanWebpackPlugin({
         dry: false,
         verbose: false,
@@ -253,15 +231,10 @@ module.exports = (env, argv) => {
         chunkFilename: '[id].css',
       }),
       new HtmlWebpackPlugin({
-        inject: false,
+        inject: true,
         hash: false,
         template: path.resolve(pathRoot, './src/index.html'),
         filename: `${packageName}.html`,
-      }),
-      new StyleLintPlugin({
-        configFile: path.resolve(pathRoot, './stylelint.config.js'),
-        files: 'src/scss/*.scss',
-        syntax: 'scss',
       }),
     ];
 
