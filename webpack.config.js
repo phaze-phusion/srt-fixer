@@ -105,7 +105,7 @@ module.exports = (env, argv) => {
     },
     plugins: [
       new MiniCssExtractPlugin({
-        filename: (argv.mode === 'development' ? '[name].css' : `${packageName}.min.css`),
+        filename: argv.mode === 'development' ? '[name].css' : `${packageName}.min.css`,
         chunkFilename: '[id].css',
       }),
       new HtmlWebpackPlugin({
@@ -113,7 +113,7 @@ module.exports = (env, argv) => {
         filename: `${indexPackageName}.html`,
         inject: true,
         hash: false,
-        minify: false,
+        minify: argv.mode !== 'development',
         template: './src/index.html',
       }),
     ],
@@ -180,40 +180,22 @@ module.exports = (env, argv) => {
         // https://webpack.js.org/plugins/terser-webpack-plugin/
         new TerserPlugin({
           test: /\.js$/i,
-          include: /\/src/,
+          exclude: /\.\/(tests|coverage|dist)/,
           parallel: true,
           extractComments: false,
+          minify: TerserPlugin.esbuildMinify,
           terserOptions: {
-            // ecma: undefined,
-            // warnings: false,
-            // parse: {},
-            // compress: {},
-            // module: false,
-
-            // Mangle advanced options see:
-            // https://lihautan.com/reduce-minified-code-size-by-property-mangling/
-            mangle: {
-              // module: true,
-              // properties: false // default value is false
-              properties: {
-                // specify a list of names to be mangled with a regex
-                // regex: /(^_)|(^(internalMessage|classNames|highlight|keepOpen|hidden|invalid|serviceError|outOfService|disclaimer|cacheKey|i18n|dataBank)$)/,
-                regex: /^_/,
-              },
-            },
-            format: {
-              comments: false, // /(?:^!|@(?:license|preserve))/i,
-            },
+            // https://esbuild.github.io/api/#keep-names
+            ecma: 2018,
+            minify: true,
+            treeShaking: true,
+            keepNames: false,
+            mangleProps: /^_/
           },
         }),
         new CssMinimizerPlugin({
           include: /\.css$/g,
-          // minify: require('cssnano'),
           minimizerOptions: {
-            // map: {
-            //   inline: false,
-            //   annotation: true,
-            // },
             sourcemap: false,
             preset: ['default', {discardComments: {removeAll: true}}],
           },
