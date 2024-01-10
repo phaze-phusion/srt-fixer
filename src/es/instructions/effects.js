@@ -56,7 +56,7 @@ export function effectsInstructions(section, includeEffects) {
  * @private
  */
 const _prepEffects = content => content.replace(
-  /([(\[])([^\])]+)([)\]])/g,
+  /([([])([^\])]+)([)\]])/g,
   (match, p1, p2) => {
     // p1 => first bracket ( or [
     // p3 => last bracket ) or ]

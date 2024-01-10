@@ -250,7 +250,7 @@ function _cleanSpeakers( text ) {
       .replace(/(- )?([A-Z0-9#&. ]{2,}:)\n([^\n]{1})/g, '$1$2 $3')
 
   // Add spaces after speaking dashes (-Lets go > - Lets go)
-      .replace(/(\n{1}-)([^\s\-]{1})/g, '$1 $2')
+      .replace(/(\n{1}-)([^\s-]{1})/g, '$1 $2')
 
   // Single speaking line where two is required
       .replace(/(\d{2},\d{3}\n)([^-]{1}[^\n]+\n- )/g, '$1- $2')

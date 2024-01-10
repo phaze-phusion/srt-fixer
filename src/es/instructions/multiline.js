@@ -1,5 +1,3 @@
-import {RX} from "../_constants";
-
 /**
  * @param {Section} section
  * @param {number} targetLength
@@ -30,7 +28,7 @@ export function collapseMultilines(section, targetLength = 35) {
   return section;
 }
 
-const _startWithCharsRegex = new RegExp(`^[${RX.NOTE_1}${RX.DASH}]`);
+// const _startWithCharsRegex = new RegExp(`^[${RX.NOTE_1}${RX.DASH}]`);
 
 /**
  * @param {string} content

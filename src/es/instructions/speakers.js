@@ -108,7 +108,7 @@ export function speakersInstructions(section, includeSpeakers, lowercaseSpeakers
 
 const RX_SPEAKER_RANGE = `[A-ZÉ0-9#&\\. ${RX.DASH}${RX.S_QUOTE}]{2,}`;
 const _speakerOneLineRegex = new RegExp(`(- )?(${RX_SPEAKER_RANGE}:)${RX.BREAK}`, 'g');
-const _spaceSpeakerDashRegex = new RegExp(`((^|${RX.BREAK})-)([^\\s\-]{1})`, 'g');
+const _spaceSpeakerDashRegex = new RegExp(`((^|${RX.BREAK})-)([^\\s-]{1})`, 'g');
 // const _cleanSpeakerRegex1 = new RegExp(`([^\\w\\s-]{1}) ?(- )?(${RX_SPEAKER_RANGE}: [^\\s]{1})`, 'g');
 // const _cleanSpeakerRegex4 = new RegExp(`^([^-]{1}[^${RX.BREAK}]+${RX.BREAK}- )`, 'g');
 // const _cleanSpeakerRegex5 = new RegExp(`^(-[^${RX.BREAK}]+${RX.BREAK})([^-]{1}[A-Z]{2,})`, 'g');

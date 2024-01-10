@@ -4,10 +4,10 @@ import {COLORS, RX, UNI} from '../_constants';
  * @param {Section} section
  * @param {LogController} logger
  * @param {boolean} includeMusic
- * @param {boolean} includeItalics
+ * @param {boolean} _includeItalics
  * @returns {Section|undefined}
  */
-export function musicInstructions(section, logger, includeMusic, includeItalics) {
+export function musicInstructions(section, logger, includeMusic, _includeItalics) {
   let content = section.content;
 
   // Return if there are no notes in section text
