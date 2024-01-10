@@ -2,42 +2,44 @@
 
 const path = require('path');
 const pathRoot = __dirname;
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const StyleLintPlugin = require('stylelint-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const npmPackage = require(path.resolve(pathRoot, './package.json'));
 
 const packageName = npmPackage.name;
 
+/**
+ * @param {null} env
+ * @param {{ mode: 'none' | 'development' | 'production' }} argv
+ */
 module.exports = (env, argv) => {
+
+  const indexPackageName = argv.mode === 'development' ? 'index' : `${packageName}`;
 
   // Common configurations
   // ------------------------------------------------------
   const config = {
     name: packageName,
-    mode: env,
-    entry: path.resolve(pathRoot, './src/index.js'),
-    // https://webpack.js.org/configuration/output/
+    mode: argv.mode,
+    entry: './src/index.js',
     output: {
-      filename: `js/${packageName}.js`,
+      filename: `js/${indexPackageName}.js`,
     },
-    target: ['browserslist'],
+    target: 'browserslist',
     resolve: {extensions: ['.js']},
+    stats: {
+      // errorDetails: true,
+      children: true,
+    },
     module: {
       rules: [
         {
-          test: /\.css$/,
-          exclude: /local/,
-          use: [
-            'style-loader',
-            {loader: 'css-loader', options: {importLoaders: 1}},
-            'postcss-loader', // options loaded from postcss.config.js
-          ],
-        },
-        {
-          test: /\.scss$/,
+          test: /\.(s?css)$/,
           use: [
             argv.mode === 'development' ? 'style-loader' : MiniCssExtractPlugin.loader,
             {
@@ -47,12 +49,7 @@ module.exports = (env, argv) => {
                 sourceMap: true,
               },
             },
-            {
-              loader: 'postcss-loader',
-              options: {
-                sourceMap: true,
-              },
-            },
+            'postcss-loader', // options loaded from postcss.config.js
             {
               loader: 'sass-loader',
               options: {
@@ -60,7 +57,7 @@ module.exports = (env, argv) => {
                 sassOptions: {
                   outputStyle: 'expanded',
                   includePaths: [
-                    path.join(pathRoot, 'src/scss/'),
+                    './src/scss/'
                   ],
                 },
               },
@@ -73,7 +70,6 @@ module.exports = (env, argv) => {
           use: [{
             loader: 'html-loader',
             options: {
-              // attrs: [':data-src'],
               minimize: argv.mode === 'development',
             },
           }],
@@ -92,20 +88,35 @@ module.exports = (env, argv) => {
             loader: 'babel-loader',
             options: {
               presets: [
-                [
-                  '@babel/preset-env',
-                  {
-                    useBuiltIns: 'usage',
-                    corejs: 3,
-                    modules: 'commonjs', // 'amd' | 'umd' | 'systemjs' | 'commonjs' | 'auto' | false, defaults to 'auto'
-                  },
-                ],
+                ['@babel/preset-env'],
               ],
+              plugins: [
+                [
+                  "@babel/plugin-transform-runtime",
+                  {
+                    regenerator: true
+                  }
+                ]
+              ]
             },
           },
         },
       ],
     },
+    plugins: [
+      new MiniCssExtractPlugin({
+        filename: (argv.mode === 'development' ? '[name].css' : `${packageName}.min.css`),
+        chunkFilename: '[id].css',
+      }),
+      new HtmlWebpackPlugin({
+        favicon: './src/favicon.ico',
+        filename: `${indexPackageName}.js`,
+        inject: true,
+        hash: false,
+        minify: false,
+        template: './src/index.html',
+      }),
+    ],
   }; // Common configurations
 
   // Development build
@@ -119,16 +130,13 @@ module.exports = (env, argv) => {
 
     // https://webpack.js.org/configuration/dev-server/
     config.devServer = {
+      hot: true,
+      watchFiles: ['src/**/*'],
+      // static: 'local',
       host: 'localhost',
       port: 4780,
-      static: {
-        directory: path.join(pathRoot, 'static'),
-        staticOptions: {},
-        publicPath: path.join(pathRoot, 'static'), // ['/static-public-path-one/', '/static-public-path-two/']
-        serveIndex: true, // options for the `serveIndex` option you can find https://github.com/expressjs/serve-index
-        watch: true, // options for the `watch` option you can find https://github.com/paulmillr/chokidar
-      },
-      client: false, // Bug on Webpack 5: https://github.com/webpack/webpack-dev-server/issues/2484
+
+      // client: false, // Bug on Webpack 5: https://github.com/webpack/webpack-dev-server/issues/2484
       // client: {
       //   logging: "info",
       //   // Can be used only for `errors`/`warnings`
@@ -147,15 +155,6 @@ module.exports = (env, argv) => {
 
     config.performance = false;
     config.devtool = 'source-map';
-    config.plugins = [
-      new HtmlWebpackPlugin({
-        inject: true,
-        hash: false,
-        minify: false,
-        template: path.resolve(pathRoot, './src/index.html'),
-        filename: 'index.html',
-      }),
-    ];
 
   } // IF mode === 'development'
 
@@ -163,14 +162,25 @@ module.exports = (env, argv) => {
   // Production build
   // ------------------------------------------------------
   if (argv.mode === 'production') {
-    config.output.path = path.resolve(pathRoot, './dist/');
-    config.output.filename = `${packageName}.min.js`;
+    config.output = {
+      filename: `${packageName}.min.js`,
+      path: path.resolve(__dirname, './dist/'),
+    };
+
+    // https://webpack.js.org/configuration/performance/
+    config.performance = {
+      // values are in bytes
+      maxEntrypointSize: (5e4), // 48.8 KiB
+      maxAssetSize: (5e4),      // 48.8 KiB
+    };
+
     config.optimization = {
       minimize: true,
       minimizer: [
         // https://webpack.js.org/plugins/terser-webpack-plugin/
         new TerserPlugin({
-          test: /\.js($|\?)/i,
+          test: /\.js$/i,
+          include: /\/src/,
           parallel: true,
           extractComments: false,
           terserOptions: {
@@ -191,7 +201,7 @@ module.exports = (env, argv) => {
                 regex: /^_/,
               },
             },
-            output: {
+            format: {
               comments: false, // /(?:^!|@(?:license|preserve))/i,
             },
           },
@@ -212,30 +222,22 @@ module.exports = (env, argv) => {
       ],
     };
 
-    // https://webpack.js.org/configuration/performance/
-    config.performance = {
-      // values are in bytes, Default = 250000 (250KB or 244KiB)
-      // KiB = KB * 0.976563
-      maxEntrypointSize: (3.6e4), // 35.2 KiB
-      maxAssetSize: (3.3e4),      // 32.2 KiB
-    };
-
     config.plugins = [
       new CleanWebpackPlugin({
         dry: false,
         verbose: false,
         cleanOnceBeforeBuildPatterns: ['./**/*'], // clean out dist directory
       }),
-      new MiniCssExtractPlugin({
-        filename: `${packageName}.min.css`,
-        chunkFilename: '[id].css',
+      new StyleLintPlugin({
+        context: './src/scss/',
+        extensions: ['scss'],
+        files: ['**/*.scss'],
       }),
-      new HtmlWebpackPlugin({
-        inject: true,
-        hash: false,
-        template: path.resolve(pathRoot, './src/index.html'),
-        filename: `${packageName}.html`,
+      new ESLintPlugin({
+        extensions: ['.js'],
+        exclude: 'node_modules'
       }),
+      ...(config.plugins),
     ];
 
   } // IF mode === 'production'

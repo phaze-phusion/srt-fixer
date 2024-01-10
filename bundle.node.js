@@ -28,7 +28,7 @@ function prepareDist(extension) {
   fs.writeSync(outStream, buildComment);
   fs.writeSync(outStream, content);
   fs.close(outStream, err => {
-    if (err) throw err; else console.info('\x1b[36m+ ${outFile}\x1b[0m');
+    if (err) throw err; else console.info(`\x1b[36m+ ${outFile}\x1b[0m`);
   });
 }
 

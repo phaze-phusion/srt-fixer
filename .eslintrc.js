@@ -8,17 +8,18 @@ module.exports = {
       configFile: false,
       presets: ["@babel/preset-env"],
     },
-    ecmaVersion: 6,
+    ecmaVersion: 2018,
     sourceType: 'module',
     ecmaFeatures: {
       modules: true,
       impliedStrict: true,
     }
   },
+  plugins: [
+  ],
   extends: [
     'eslint:recommended',
   ],
-  plugins: [],
   env: {
     es6: true,
     browser: true,
@@ -28,5 +29,13 @@ module.exports = {
     'dist/',
     'node_modules/',
   ],
-  rules: {},
+  rules: {
+    'no-control-regex': 'off',
+    'no-unused-vars': [
+      'error', // or "error"
+      {
+        'argsIgnorePattern': '^_',
+      }
+    ]
+  },
 };
