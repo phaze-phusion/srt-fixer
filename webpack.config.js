@@ -110,7 +110,7 @@ module.exports = (env, argv) => {
       }),
       new HtmlWebpackPlugin({
         favicon: './src/favicon.ico',
-        filename: `${indexPackageName}.js`,
+        filename: `${indexPackageName}.html`,
         inject: true,
         hash: false,
         minify: false,
